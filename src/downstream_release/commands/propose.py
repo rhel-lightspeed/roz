@@ -25,7 +25,7 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
 
 
 def run(args: argparse.Namespace) -> None:
-    branches = args.branches or BRANCHES
+    branches = args.branches
     print("command: propose")
     print(f"dry_run: {args.dry_run}")
     print(f"version: {args.version}")

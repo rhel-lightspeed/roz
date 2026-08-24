@@ -5,9 +5,6 @@ import argparse
 from downstream_release.const import BRANCHES
 
 
-NON_RAWHIDE = [b for b in BRANCHES if b != "rawhide"]
-
-
 def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
     parser = subparsers.add_parser(
         "update",
@@ -42,7 +39,7 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
 
 
 def run(args: argparse.Namespace) -> None:
-    branches = args.branches or NON_RAWHIDE
+    branches = args.branches
     print("command: update")
     print(f"dry_run: {args.dry_run}")
     print(f"update_type: {args.update_type}")

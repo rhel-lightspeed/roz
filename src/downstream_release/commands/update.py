@@ -2,13 +2,19 @@
 
 import argparse
 
-from downstream_release.const import BRANCHES
+from downstream_release.workflows import WORKFLOW_MAP
 
 
 def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
     parser = subparsers.add_parser(
         "update",
         help="Stage 3: create Bodhi updates (skips rawhide).",
+    )
+    parser.add_argument(
+        "--project",
+        choices=list(WORKFLOW_MAP),
+        required=True,
+        help="Project to update (e.g. goose).",
     )
     parser.add_argument(
         "--type",
@@ -30,19 +36,19 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
     )
     parser.add_argument(
         "--branch",
-        choices=BRANCHES,
         action="append",
         dest="branches",
+        metavar="BRANCH",
         help="Limit to specific branch(es). May be repeated. Default: all.",
     )
     parser.set_defaults(handler=run)
 
 
 def run(args: argparse.Namespace) -> None:
-    branches = args.branches
-    print("command: update")
-    print(f"dry_run: {args.dry_run}")
-    print(f"update_type: {args.update_type}")
-    print(f"bugs: {args.bugs}")
-    print(f"severity: {args.severity}")
-    print(f"branches: {branches}")
+    WORKFLOW_MAP[args.project].update(
+        update_type=args.update_type,
+        severity=args.severity,
+        bugs=args.bugs,
+        branches=args.branches,
+        dry_run=args.dry_run,
+    )

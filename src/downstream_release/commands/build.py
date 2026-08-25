@@ -2,7 +2,7 @@
 
 import argparse
 
-from downstream_release.const import BRANCHES
+from downstream_release.workflows import WORKFLOW_MAP
 
 
 def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
@@ -11,17 +11,23 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
         help="Stage 2: kick off Koji builds for merged PRs.",
     )
     parser.add_argument(
+        "--project",
+        choices=list(WORKFLOW_MAP),
+        required=True,
+        help="Project to build (e.g. goose).",
+    )
+    parser.add_argument(
         "--branch",
-        choices=BRANCHES,
         action="append",
         dest="branches",
+        metavar="BRANCH",
         help="Limit to specific branch(es). May be repeated. Default: all.",
     )
     parser.set_defaults(handler=run)
 
 
 def run(args: argparse.Namespace) -> None:
-    branches = args.branches
-    print("command: build")
-    print(f"dry_run: {args.dry_run}")
-    print(f"branches: {branches}")
+    WORKFLOW_MAP[args.project].build(
+        branches=args.branches,
+        dry_run=args.dry_run,
+    )

@@ -17,6 +17,17 @@ def _build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Simulate actions without making real changes.",
     )
+    parser.add_argument(
+        "-y",
+        "--yes",
+        action="store_true",
+        help="Skip diff prompts (passes --skip-diffs to fedpkg import).",
+    )
+    parser.add_argument(
+        "--keep",
+        action="store_true",
+        help="Keep temporary worktree directories after completion (for debugging).",
+    )
 
     sub = parser.add_subparsers(dest="command", required=True)
 

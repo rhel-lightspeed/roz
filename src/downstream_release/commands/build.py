@@ -29,5 +29,4 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
 def run(args: argparse.Namespace) -> None:
     WORKFLOW_MAP[args.project].build(
         branches=args.branches,
-        dry_run=args.dry_run,
     )

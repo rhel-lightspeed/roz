@@ -42,16 +42,38 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
         action="store_true",
         help="Skip tarball upload to lookaside cache (for testing).",
     )
+    parser.add_argument(
+        "--resolve",
+        action="append",
+        dest="resolves",
+        metavar="TICKET",
+        help=(
+            "Bug or ticket to resolve (e.g. rhbz#12345 or RSPEED-678). "
+            "May be repeated. Appended as 'Resolves: TICKET' trailers in the commit message."
+        ),
+    )
     parser.set_defaults(handler=run)
 
 
 def run(args: argparse.Namespace) -> None:
-    WORKFLOW_MAP[args.project].propose(
+    project = WORKFLOW_MAP[args.project]
+    forge_branches = project.DIST_GIT_BRANCHES[args.forge]  # pyright:  ignore[reportAttributeAccessIssue]
+    branches = args.branches or forge_branches
+
+    unknown = sorted(set(branches) - set(forge_branches))
+    if unknown:
+        raise SystemExit(
+            f"Unknown branch(es) for goose on {args.forge!r}: "
+            f"{', '.join(unknown)}\n"
+            f"Valid branches: {', '.join(forge_branches)}"
+        )
+
+    project.propose(
         forge_name=args.forge,
         version=args.version,
         branches=args.branches,
-        dry_run=args.dry_run,
         offline=args.offline,
         yes=args.yes,
         keep=args.keep,
+        resolves=args.resolves,
     )

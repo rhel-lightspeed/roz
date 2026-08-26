@@ -69,6 +69,8 @@ def get_fork_push_url(project: GitProject) -> str:
         SSH URL of the user's fork, suitable for ``git push``.
     """
     fork = project.get_fork(create=True)
+    if fork is None:
+        raise RuntimeError(f"Could not get or create a fork for {project.full_repo_name!r}.")
     urls = fork.get_git_urls()
     return urls.get("ssh") or urls["git"]
 
@@ -98,8 +100,7 @@ def open_pr(
     target_branch: str,
     source_branch: str,
     fork_username: str | None = None,
-    dry_run: bool = False,
-) -> PullRequest | None:
+) -> PullRequest:
     """Open a pull request on any supported forge.
 
     Args:
@@ -111,23 +112,10 @@ def open_pr(
             (e.g. ``'downstream-release/1.2.3/rawhide'``).
         fork_username: Owner of the source fork. Required for Pagure;
             pass ``None`` for direct-push forges such as GitLab.
-        dry_run: When ``True``, log the intended action and return
-            ``None`` without making any API calls.
 
     Returns:
-        The newly created :class:`~ogr.abstract.PullRequest`, or
-        ``None`` when *dry_run* is ``True``.
+        The newly created :class:`~ogr.abstract.PullRequest`.
     """
-    if dry_run:
-        logger.info(
-            "[dry-run] Would open PR on %s: %s -> %s (fork_username=%r)",
-            project.full_repo_name,
-            source_branch,
-            target_branch,
-            fork_username,
-        )
-        return None
-
     pr = project.create_pr(
         title=title,
         body=body,

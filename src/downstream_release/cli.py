@@ -13,11 +13,6 @@ def _build_parser() -> argparse.ArgumentParser:
         description="Fedora/EPEL release automation for goose.",
     )
     parser.add_argument(
-        "--dry-run",
-        action="store_true",
-        help="Simulate actions without making real changes.",
-    )
-    parser.add_argument(
         "-y",
         "--yes",
         action="store_true",

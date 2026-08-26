@@ -29,9 +29,13 @@ test:
 	uv run --locked pytest tests/
 
 radon:
-	@uv run --locked radon cc src/ -s --min C | grep -q . \
-		&& { echo "FAIL: Cyclomatic complexity C or higher detected"; exit 1; } \
-		|| echo "PASS: All functions rated A or B"
+	@out=$$(uv run --locked radon cc src/ -s --min C); \
+	if [ -n "$$out" ]; then \
+		echo "$$out"; \
+		echo "FAIL: Cyclomatic complexity C or higher detected"; \
+		exit 1; \
+	fi; \
+	echo "PASS: All functions rated A or B"
 
 ci: lint format typecheck radon test
 	@echo ""

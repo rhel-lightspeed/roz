@@ -50,5 +50,4 @@ def run(args: argparse.Namespace) -> None:
         severity=args.severity,
         bugs=args.bugs,
         branches=args.branches,
-        dry_run=args.dry_run,
     )

@@ -15,11 +15,11 @@ class WorkflowProtocol(Protocol):
         self,
         forge_name: str,
         version: str,
-        branches: list[str] | None,
-        dry_run: bool,
         offline: bool,
         yes: bool,
         keep: bool,
+        branches: list[str],
+        resolves: list[str] | None,
     ) -> None:
         """Stage 1: generate SRPM, import SRPM, open dist-git PRs."""
         ...
@@ -27,7 +27,6 @@ class WorkflowProtocol(Protocol):
     def build(
         self,
         branches: list[str] | None,
-        dry_run: bool,
     ) -> None:
         """Stage 2: kick off Koji builds for merged PRs."""
         ...
@@ -38,7 +37,6 @@ class WorkflowProtocol(Protocol):
         severity: str,
         bugs: list[str] | None,
         branches: list[str] | None,
-        dry_run: bool,
     ) -> None:
         """Stage 3: create Bodhi updates."""
         ...

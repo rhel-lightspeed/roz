@@ -8,13 +8,17 @@ from pathlib import Path
 FEDPKG_BIN = "/usr/bin/fedpkg"
 
 
-def generate_srpm(repo_dir: Path) -> Path:
+def generate_srpm(repo_dir: Path, dry_run: bool = False) -> Path:
     """Run fedpkg srpm in an already-cloned upstream repo and return the SRPM path."""
-    subprocess.run(  # noqa: S603
-        [FEDPKG_BIN, "srpm"],
-        cwd=repo_dir,
-        check=True,
-    )
+    if not dry_run:
+        subprocess.run(  # noqa: S603
+            [FEDPKG_BIN, "srpm"],
+            cwd=repo_dir,
+            check=True,
+        )
+    else:
+        print(f"DRY RUN: generating srpm {repo_dir}")
+        return repo_dir / "dry-run.src.rpm"
 
     srpms = list(repo_dir.glob("*.src.rpm"))
     if not srpms:

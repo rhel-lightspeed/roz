@@ -10,17 +10,36 @@ from roz import srpm
 from roz.packages.protocol import PackageProtocol
 
 
-def _generate_vendor_tarball(repo_dir: Path) -> None:
+def _generate_vendor_tarball(repo_dir: Path, dry_run: bool = False) -> None:
     """Run a make target in the given directory.
 
     Args:
         repo_dir: Path to the directory containing the Makefile.
     """
-    subprocess.run(
-        ["/usr/bin/make", "vendor-tarball"],
-        cwd=repo_dir,
-        check=True,
-    )
+    if not dry_run:
+        subprocess.run(
+            ["/usr/bin/make", "vendor-tarball"],
+            cwd=repo_dir,
+            check=True,
+        )
+    else:
+        print("DRY RUN: create vendor tarball")
+
+
+COMMIT_MESSAGE = "Rebase for goose {version}"
+RELEASE_TOOL_URL = "https://github.com/rhel-lightspeed/roz"
+
+DIST_GIT_BRANCHES = {
+    "pagure": ["rawhide", "f44", "f43", "epel9", "epel10", "epel10.2"],
+    "gitlab": ["ext-rhel-10.2", "ext-rhel-9.8"],
+}
+
+UPSTREAM_REPO_URL = "git@github.com:rhel-lightspeed/goose.git"
+
+DIST_GIT_URLS = {
+    "pagure": "https://src.fedoraproject.org/rpms/goose",
+    "gitlab": "https://gitlab.com/redhat/rhel/rpms/goose",
+}
 
 
 class GoosePackage(PackageProtocol):
@@ -76,11 +95,12 @@ class GoosePackage(PackageProtocol):
             resolves: Bug or ticket identifiers to append as ``Resolve: <id>``
                 trailers in the commit message (e.g. ``['rhbz#12345', 'RSPEED-12345']``).
         """
-        with git.clone(self.UPSTREAM_REPO_URL, branch="main", keep=keep) as upstream_dir:
-            _generate_vendor_tarball(upstream_dir)
-            srpm_path = srpm.generate_srpm(upstream_dir)
+        with git.clone(self.UPSTREAM_REPO_URL, branch="main", keep=keep, dry_run=self.dry_run) as upstream_dir:
+            _generate_vendor_tarball(upstream_dir, self.dry_run)
+            srpm_path = srpm.generate_srpm(upstream_dir, self.dry_run)
 
         self._open_pull_request(branches, version, forge_name, srpm_path, keep, offline, yes, resolves)
+
 
     def _open_pull_request(
         self,
@@ -122,6 +142,10 @@ class GoosePackage(PackageProtocol):
         if resolves:
             trailers = "\n".join(f"Resolve: {ticket}" for ticket in resolves)
             commit_message = f"{commit_message}\n\n{trailers}"
+
+        if self.dry_run:
+            print("DRY RUN: Opening pull request")
+            return
 
         url = self.DIST_GIT_URLS[forge_name]
         project = forge.get_project(url)

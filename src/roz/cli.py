@@ -1,16 +1,16 @@
-"""CLI entry point for downstream-release."""
+"""CLI entry point for roz."""
 
 import argparse
 
-from downstream_release.commands import build
-from downstream_release.commands import propose
-from downstream_release.commands import update
+from roz.commands import build
+from roz.commands import propose
+from roz.commands import update
 
 
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="downstream-release",
-        description="Fedora/EPEL release automation for goose.",
+        prog="roz",
+        description="Fedora/EPEL release automation for goose (and friends).",
     )
     parser.add_argument(
         "-y",

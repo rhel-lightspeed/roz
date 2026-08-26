@@ -7,7 +7,7 @@ from pathlib import Path
 from roz import forge
 from roz import git
 from roz import srpm
-from roz.workflows.protocol import WorkflowProtocol
+from roz.packages.protocol import PackageProtocol
 
 
 def _generate_vendor_tarball(repo_dir: Path) -> None:
@@ -23,7 +23,7 @@ def _generate_vendor_tarball(repo_dir: Path) -> None:
     )
 
 
-class GooseWorkflow(WorkflowProtocol):
+class GoosePackage(PackageProtocol):
     """Release workflow for the goose project."""
 
     COMMIT_MESSAGE = "Rebase for goose {version}"

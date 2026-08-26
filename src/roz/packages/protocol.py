@@ -1,15 +1,19 @@
-"""Protocol module for workflow"""
+"""Protocol module for any package"""
 
 from typing import Protocol
 
 
-class WorkflowProtocol(Protocol):
+class PackageProtocol(Protocol):
     """Interface that every workflow module must satisfy.
 
     Each workflow encapsulates all project-specific logic for the three
     release stages. The commands layer dispatches into these methods;
     shared utilities (forge, srpm, git) are called from within.
     """
+
+    DIST_GIT_BRANCHES: dict[str, list[str]] = {}
+    DIST_GIT_URL: dict[str, str] = {}
+    UPSTREAM_REPO_URL: str
 
     def propose(
         self,

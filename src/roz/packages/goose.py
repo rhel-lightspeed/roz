@@ -6,6 +6,7 @@ from pathlib import Path
 
 from roz import forge
 from roz import git
+from roz import koji
 from roz import srpm
 from roz.packages.protocol import PackageProtocol
 
@@ -126,10 +127,7 @@ class GoosePackage(PackageProtocol):
         fork_push_url = forge.get_fork_push_url(project)
         fork_username = forge.get_fork_username(project)
 
-        # We use branches[0] as a way to clone a valid branch for the project, being either the one specified in
-        # `--branches <branch>`, or one of the valid set of branches for the forge.
-        #
-        # We also use shallow=False because we need to push a new commit for the desired branches after
+        # We use shallow=False because we need to push a new commit for the desired branches after
         # we are done importing the srpm contents.
         with git.clone(url, shallow=False, keep=keep) as distgit_dir:
             for branch in branches:
@@ -157,10 +155,44 @@ class GoosePackage(PackageProtocol):
 
     def build(
         self,
-        branches: list[str] | None,
+        forge_name: str,
+        branches: list[str],
+        scratch_build: bool = False,
+        arches: str | None = None,
+        keep: bool = False,
     ) -> None:
-        """Stage 2: kick off Koji builds for merged PRs."""
-        raise NotImplementedError("build stage is not yet implemented for goose.")
+        """Clone the dist-git and submit Koji builds for each target branch.
+
+        For each branch, optionally runs a scratch build first (to validate the
+        package before committing a real build slot), then submits the real build.
+        Both are submitted with ``--nowait``; Koji task URLs are printed as they
+        are queued.
+
+        Args:
+            forge_name: Key into :attr:`DIST_GIT_URLS` / :attr:`DIST_GIT_BRANCHES`
+                (e.g. ``'pagure'`` or ``'gitlab'``).
+            branches: Dist-git branches to build. Must be non-empty and already
+                validated by the caller.
+            scratch_build: When ``True``, run ``fedpkg scratch-build --nowait``
+                before the real build.
+            arches: Optional space-separated architecture list passed to
+                ``fedpkg scratch-build --arches`` (e.g. ``"x86_64 aarch64"``).
+                Ignored when *scratch_build* is ``False``.
+            keep: When ``True``, preserve the temporary dist-git clone directory
+                after the run completes (useful for debugging).
+        """
+        url = self.DIST_GIT_URLS[forge_name]
+
+        with git.clone(url, shallow=False, keep=keep) as distgit_dir:
+            for branch in branches:
+                git.checkout(distgit_dir, branch)
+
+                if scratch_build:
+                    task_url = koji.build(distgit_dir, arches=arches, scratch_build=True)
+                    print(f"[{branch}] scratch-build: {task_url}")
+
+                task_url = koji.build(distgit_dir)
+                print(f"[{branch}] build: {task_url}")
 
     def update(
         self,

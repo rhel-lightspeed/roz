@@ -26,14 +26,16 @@ class PackageProtocol(Protocol):
         resolves: list[str] | None,
     ) -> None:
         """Stage 1: generate SRPM, import SRPM, open dist-git PRs."""
-        ...
 
     def build(
         self,
-        branches: list[str] | None,
+        forge_name: str,
+        branches: list[str],
+        scratch_build: bool,
+        arches: str | None,
+        keep: bool,
     ) -> None:
         """Stage 2: kick off Koji builds for merged PRs."""
-        ...
 
     def update(
         self,
@@ -43,4 +45,3 @@ class PackageProtocol(Protocol):
         branches: list[str] | None,
     ) -> None:
         """Stage 3: create Bodhi updates."""
-        ...

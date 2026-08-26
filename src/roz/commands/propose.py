@@ -56,7 +56,7 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
 
 
 def run(args: argparse.Namespace) -> None:
-    project = PACKAGES_MAP[args.project]
+    project = PACKAGES_MAP[args.project](dry_run=args.dry_run)
     forge_branches = project.DIST_GIT_BRANCHES[args.forge]
     branches = args.branches or forge_branches
 

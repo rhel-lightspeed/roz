@@ -4,6 +4,6 @@ from roz.packages.goose import GoosePackage
 from roz.packages.protocol import PackageProtocol
 
 
-PACKAGES_MAP: dict[str, PackageProtocol] = {
-    "goose": GoosePackage(),
+PACKAGES_MAP: dict[str, type[PackageProtocol]] = {
+    "goose": GoosePackage,
 }

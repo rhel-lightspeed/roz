@@ -45,7 +45,8 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
 
 
 def run(args: argparse.Namespace) -> None:
-    PACKAGES_MAP[args.project].update(
+    project = PACKAGES_MAP[args.project](dry_run=args.dry_run)
+    project.update(
         update_type=args.update_type,
         severity=args.severity,
         bugs=args.bugs,

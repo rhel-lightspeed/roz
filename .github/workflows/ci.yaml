@@ -15,7 +15,9 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
-      - run: make setup
+      - run: |
+          sudo apt update -y && sudo apt install libkrb5-dev build-essential python3-dev -y
+          make setup\\
       - run: make lint
 
   format:
@@ -24,7 +26,9 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
-      - run: make setup
+      - run: |
+          sudo apt update -y && sudo apt install libkrb5-dev build-essential python3-dev -y
+          make setup
       - run: make format-check
 
   typecheck:
@@ -33,7 +37,9 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
-      - run: make setup
+      - run: |
+          sudo apt update -y && sudo apt install libkrb5-dev build-essential python3-dev -y
+          make setup
       - run: make typecheck
 
   radon:
@@ -42,7 +48,9 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
-      - run: make setup
+      - run: |
+          sudo apt update -y && sudo apt install libkrb5-dev build-essential python3-dev -y
+          make setup
       - run: make radon
 
   test:
@@ -51,5 +59,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
-      - run: make setup
+      - run: |
+          sudo apt update -y && sudo apt install libkrb5-dev build-essential python3-dev -y
+          make setup
       - run: make test

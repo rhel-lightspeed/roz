@@ -109,7 +109,7 @@ def open_pr(
         body: PR description body.
         target_branch: Branch to merge into (e.g. ``'rawhide'``).
         source_branch: Branch containing the changes
-            (e.g. ``'downstream-release/1.2.3/rawhide'``).
+            (e.g. ``'roz/1.2.3/rawhide'``).
         fork_username: Owner of the source fork. Required for Pagure;
             pass ``None`` for direct-push forges such as GitLab.
 

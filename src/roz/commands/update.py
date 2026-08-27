@@ -2,7 +2,7 @@
 
 import argparse
 
-from roz.workflows import WORKFLOW_MAP
+from roz.packages import PACKAGES_MAP
 
 
 def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
@@ -12,7 +12,7 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
     )
     parser.add_argument(
         "--project",
-        choices=list(WORKFLOW_MAP),
+        choices=list(PACKAGES_MAP.keys()),
         required=True,
         help="Project to update (e.g. goose).",
     )
@@ -45,7 +45,7 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
 
 
 def run(args: argparse.Namespace) -> None:
-    WORKFLOW_MAP[args.project].update(
+    PACKAGES_MAP[args.project].update(
         update_type=args.update_type,
         severity=args.severity,
         bugs=args.bugs,

@@ -2,7 +2,7 @@
 
 import argparse
 
-from roz.workflows import WORKFLOW_MAP
+from roz.packages import PACKAGES_MAP
 
 
 def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
@@ -12,7 +12,7 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
     )
     parser.add_argument(
         "--project",
-        choices=list(WORKFLOW_MAP),
+        choices=list(PACKAGES_MAP.keys()),
         required=True,
         help="Project to release (e.g. goose).",
     )
@@ -56,8 +56,8 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
 
 
 def run(args: argparse.Namespace) -> None:
-    project = WORKFLOW_MAP[args.project]
-    forge_branches = project.DIST_GIT_BRANCHES[args.forge]  # pyright:  ignore[reportAttributeAccessIssue]
+    project = PACKAGES_MAP[args.project]
+    forge_branches = project.DIST_GIT_BRANCHES[args.forge]
     branches = args.branches or forge_branches
 
     unknown = sorted(set(branches) - set(forge_branches))

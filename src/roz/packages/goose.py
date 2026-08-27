@@ -47,7 +47,6 @@ class GoosePackage(PackageProtocol):
     def propose(
         self,
         forge_name: str,
-        version: str,
         offline: bool = False,
         yes: bool = False,
         keep: bool = False,
@@ -57,14 +56,14 @@ class GoosePackage(PackageProtocol):
         """Clone upstream, build an SRPM, and open dist-git PRs for each target branch.
 
         Clones the goose upstream repository, generates a vendor tarball, and
-        builds an SRPM. Then, for each target branch, imports the SRPM into the
-        dist-git worktree, commits, pushes to the user's fork, and opens a pull
-        request against the upstream dist-git project.
+        builds an SRPM. The version is read from the generated SRPM so it does
+        not need to be supplied by the caller. Then, for each target branch,
+        imports the SRPM into the dist-git worktree, commits, pushes to the
+        user's fork, and opens a pull request against the upstream dist-git project.
 
         Args:
             forge_name: Key into :attr:`DIST_GIT_URLS` / :attr:`DIST_GIT_BRANCHES`
                 (e.g. ``'pagure'`` or ``'gitlab'``).
-            version: Upstream version string being released (e.g. ``'1.2.3'``).
             offline: When ``True``, skip the lookaside-cache tarball upload during
                 ``fedpkg import`` (useful for air-gapped or test environments).
             yes: When ``True``, pass ``--skip-diffs`` to ``fedpkg import``,
@@ -80,6 +79,7 @@ class GoosePackage(PackageProtocol):
         with git.clone(self.UPSTREAM_REPO_URL, branch="main", keep=keep) as upstream_dir:
             _generate_vendor_tarball(upstream_dir)
             srpm_path = srpm.generate_srpm(upstream_dir)
+            version = srpm.version_from_srpm(srpm_path, self.NAME)
 
         self._open_pull_request(branches, version, forge_name, srpm_path, keep, offline, yes, resolves)
 

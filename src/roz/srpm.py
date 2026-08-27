@@ -8,6 +8,23 @@ from pathlib import Path
 FEDPKG_BIN = "/usr/bin/fedpkg"
 
 
+def version_from_srpm(srpm_path: Path, name: str) -> str:
+    """Extract the version from an SRPM filename.
+
+    Parses the NVR embedded in the filename (``{name}-{version}-{release}.src.rpm``)
+    without invoking any external tools, making it portable across platforms.
+
+    Args:
+        srpm_path: Path to the ``.src.rpm`` file.
+        name: Package name prefix to strip (e.g. ``"goose"``).
+
+    Returns:
+        The version string (e.g. ``"1.2.3"``).
+    """
+    stem = srpm_path.stem.removesuffix(".src")  # goose-1.2.3-1.fc44
+    return stem.removeprefix(f"{name}-").rsplit("-", 1)[0]
+
+
 def generate_srpm(repo_dir: Path) -> Path:
     """Run fedpkg srpm in an already-cloned upstream repo and return the SRPM path."""
     subprocess.run(  # noqa: S603

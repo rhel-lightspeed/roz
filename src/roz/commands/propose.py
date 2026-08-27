@@ -24,11 +24,6 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
         help="Forge to open PRs on.",
     )
     parser.add_argument(
-        "--version",
-        required=True,
-        help="Upstream version to release.",
-    )
-    parser.add_argument(
         "--branch",
         action="append",
         dest="branches",
@@ -62,7 +57,6 @@ def run(args: argparse.Namespace) -> None:
 
     project.propose(
         forge_name=args.forge,
-        version=args.version,
         branches=branches,
         offline=args.offline,
         yes=args.yes,

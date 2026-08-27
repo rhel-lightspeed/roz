@@ -1,18 +1,18 @@
-"""Token resolution for downstream-release forges."""
+"""Token resolution for downstream release to different forges forges."""
 
 import os
 
 import keyring
 
 
-KEYRING_SERVICE = "downstream-release"
+KEYRING_SERVICE = "roz"
 
 
 def get_token(forge: str) -> str:
     """Resolve the auth token for the given forge name.
 
     Lookup order:
-    1. System keyring  (keyring set downstream-release <forge>)
+    1. System keyring  (keyring set roz <forge>)
     2. Environment variable  (<FORGE>_TOKEN)
 
     Args:

@@ -1,4 +1,4 @@
-"""downstream-release: Fedora/EPEL release automation for goose."""
+"""roz: Fedora/EPEL release automation for goose."""
 
 from roz.cli import main
 

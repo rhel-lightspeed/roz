@@ -1,5 +1,4 @@
-def main() -> None:
-    print("Hello from downstream-release!")
+from roz.cli import main
 
 
 if __name__ == "__main__":

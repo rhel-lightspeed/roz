@@ -1,4 +1,4 @@
-"""Git operations for downstream-release."""
+"""Git operations for downstream release."""
 
 import subprocess
 import tempfile
@@ -33,7 +33,7 @@ def clone(
         keep: When ``True``, the temporary directory is not deleted on exit
             and its path is printed so it can be inspected for debugging.
     """
-    with tempfile.TemporaryDirectory(prefix="downstream-release-", delete=not keep) as tmpdir:
+    with tempfile.TemporaryDirectory(prefix="roz-", delete=not keep) as tmpdir:
         repo_dir = Path(tmpdir) / "repo"
 
         cmd = [GIT_BIN, "clone"]
@@ -73,7 +73,7 @@ def create_branch(repo_dir: Path, branch: str) -> None:
     Args:
         repo_dir: Path to the local git repository.
         branch: Name of the new branch to create
-            (e.g. ``"downstream-release/1.2.3/rawhide"``).
+            (e.g. ``"roz/1.2.3/rawhide"``).
     """
     subprocess.run(  # noqa: S603
         [GIT_BIN, "checkout", "-b", branch],
@@ -103,7 +103,7 @@ def push(repo_dir: Path, fork_url: str, source_branch: str) -> None:
         repo_dir: Path to the local git repository.
         fork_url: URL of the fork to push to.
         source_branch: Remote branch name to push to
-            (e.g. ``"downstream-release/1.2.3/rawhide"``).
+            (e.g. ``"roz/1.2.3/rawhide"``).
     """
     subprocess.run(  # noqa: S603
         [GIT_BIN, "push", fork_url, f"HEAD:{source_branch}"],

@@ -1,4 +1,4 @@
-"""SRPM build and import operations for downstream-release."""
+"""SRPM build and import operations for downstream release."""
 
 import subprocess
 

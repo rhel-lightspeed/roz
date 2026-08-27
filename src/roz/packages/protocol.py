@@ -15,6 +15,7 @@ class PackageProtocol(Protocol):
     DIST_GIT_BRANCHES: dict[str, list[str]] = {}
     DIST_GIT_URL: dict[str, str] = {}
     UPSTREAM_REPO_URL: str
+    BODHI_SKIP_BRANCHES: set[str] = set()
 
     def propose(
         self,
@@ -43,6 +44,7 @@ class PackageProtocol(Protocol):
         update_type: str,
         severity: str,
         bugs: list[str] | None,
-        branches: list[str] | None,
+        branches: list[str],
+        stable_karma: int,
     ) -> None:
         """Stage 3: create Bodhi updates."""

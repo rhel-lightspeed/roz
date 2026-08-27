@@ -4,6 +4,7 @@ import subprocess
 
 from pathlib import Path
 
+from roz import bodhi
 from roz import forge
 from roz import git
 from roz import koji
@@ -200,7 +201,27 @@ class GoosePackage(PackageProtocol):
         update_type: str,
         severity: str,
         bugs: list[str] | None,
-        branches: list[str] | None,
+        branches: list[str],
+        stable_karma: int,
     ) -> None:
-        """Stage 3: create Bodhi updates."""
-        raise NotImplementedError("update stage is not yet implemented for goose.")
+        """Stage 3: create Bodhi updates for all non-rawhide pagure branches.
+
+        Clones the pagure dist-git (shallow) and runs ``fedpkg update`` on each
+        target branch, using the ``changelog`` file as the update notes.
+        Rawhide is always excluded: it is auto-composed and does not need a
+        Bodhi update.
+
+        Args:
+            update_type: Bodhi update type (e.g. ``"enhancement"``, ``"bugfix"``,
+                ``"security"``).
+            severity: Bodhi severity level (e.g. ``"unspecified"``, ``"urgent"``).
+            bugs: Optional list of bug IDs to associate with the updates.
+            branches: Explicit branch list from ``--branch``. When ``None``, all
+                non-rawhide pagure branches are targeted.
+        """
+        url = self.DIST_GIT_URLS["pagure"]
+        with git.clone(url, shallow=True) as distgit_dir:
+            for branch in branches:
+                git.checkout(distgit_dir, branch)
+                bodhi.update(distgit_dir, update_type, severity, bugs, stable_karma)
+                print(f"[{branch}] Bodhi update submitted.")

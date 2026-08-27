@@ -17,6 +17,7 @@ def clone(
     branch: str | None = None,
     shallow: bool = True,
     keep: bool = False,
+    dry_run: bool = False,
 ) -> Generator[Path]:
     """Clone a repo into a temporary directory and yield its path.
 

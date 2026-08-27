@@ -24,6 +24,13 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Keep temporary worktree directories after completion (for debugging).",
     )
 
+    parser.add_argument(
+        "-n",
+        "--dry-run",
+        action="store_true",
+        help="Do not make changes."
+    )
+
     sub = parser.add_subparsers(dest="command", required=True)
 
     propose.register(sub)

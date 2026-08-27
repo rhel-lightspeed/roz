@@ -27,6 +27,7 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
 
 
 def run(args: argparse.Namespace) -> None:
-    PACKAGES_MAP[args.project].build(
+    project = PACKAGES_MAP[args.project](dry_run=args.dry_run)
+    project.build(
         branches=args.branches,
     )

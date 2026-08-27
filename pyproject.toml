@@ -8,7 +8,6 @@ authors = [
 ]
 requires-python = ">=3.14"
 dependencies = [
-    "bodhi-client>=26.4.0",
     "keyring>=25.0.0",
     "ogr>=0.62.4",
 ]

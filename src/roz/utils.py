@@ -4,7 +4,6 @@ from roz.packages.protocol import PackageProtocol
 
 
 def resolve_branches(
-    project_name: str,
     project: PackageProtocol,
     forge_name: str,
     requested: list[str] | None,
@@ -15,7 +14,6 @@ def resolve_branches(
     branches defined for *forge_name* in the workflow.
 
     Args:
-        project_name: Human-readable project key used in error messages (e.g. ``'goose'``).
         project: Workflow instance whose ``DIST_GIT_BRANCHES`` mapping is consulted.
         forge_name: Forge key (e.g. ``'pagure'`` or ``'gitlab'``).
         requested: Branch names supplied by the user via ``--branch``, or ``None``
@@ -30,7 +28,7 @@ def resolve_branches(
     unknown = sorted(set(branches) - set(valid))
     if unknown:
         raise SystemExit(
-            f"Unknown branch(es) for {project_name!r} on {forge_name!r}: "
+            f"Unknown branch(es) for {project.NAME!r} on {forge_name!r}: "
             f"{', '.join(unknown)}\n"
             f"Valid branches: {', '.join(valid)}"
         )

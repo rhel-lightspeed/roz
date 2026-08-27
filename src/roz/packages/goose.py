@@ -27,6 +27,7 @@ def _generate_vendor_tarball(repo_dir: Path) -> None:
 class GoosePackage(PackageProtocol):
     """Release workflow for the goose project."""
 
+    NAME = "goose"
     COMMIT_MESSAGE = "Rebase for goose {version}"
     RELEASE_TOOL_URL = "https://github.com/rhel-lightspeed/roz"
 

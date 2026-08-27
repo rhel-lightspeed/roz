@@ -58,7 +58,7 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
 
 def run(args: argparse.Namespace) -> None:
     project = PACKAGES_MAP[args.project]
-    branches = utils.resolve_branches(args.project, project, args.forge, args.branches)
+    branches = utils.resolve_branches(project, args.forge, args.branches)
 
     project.propose(
         forge_name=args.forge,

@@ -131,7 +131,7 @@ class GoosePackage(PackageProtocol):
         #
         # We also use shallow=False because we need to push a new commit for the desired branches after
         # we are done importing the srpm contents.
-        with git.clone(url, branch=branches[0], single_branch=False, shallow=False, keep=keep) as distgit_dir:
+        with git.clone(url, shallow=False, keep=keep) as distgit_dir:
             for branch in branches:
                 source_branch = f"roz/{version}/{branch}"
 

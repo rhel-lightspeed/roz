@@ -14,8 +14,7 @@ GIT_BIN = "/usr/bin/git"
 @contextmanager
 def clone(
     repo_url: str,
-    branch: str = "main",
-    single_branch: bool = True,
+    branch: str | None = None,
     shallow: bool = True,
     keep: bool = False,
 ) -> Generator[Path]:
@@ -26,11 +25,7 @@ def clone(
 
     Args:
         repo_url: URL of the repository to clone.
-        branch: Branch to clone. Defaults to ``"main"``.
-        single_branch: When ``True`` (default), passes ``--single-branch``
-            to clone only the specified branch. Set to ``False`` to fetch
-            all remote branches (needed when checking out multiple branches
-            from the same clone, e.g. dist-git).
+        branch: Branch to clone. Defaults to ``"main"`` or whatever is the remote default.
         shallow: When ``True`` (default), passes ``--depth 1`` to create a
             shallow clone. Set to ``False`` for a full clone — required when
             the clone will be used as a push source, since git does not allow
@@ -44,10 +39,10 @@ def clone(
         cmd = [GIT_BIN, "clone"]
         if shallow:
             cmd += ["--depth", "1"]
-        if single_branch:
+
+        if branch:
             cmd += ["--branch", branch]
-        else:
-            cmd += ["--no-single-branch", "--branch", branch]
+
         cmd += [repo_url, str(repo_dir)]
 
         subprocess.run(cmd, cwd=repo_dir.parent, check=True)  # noqa: S603

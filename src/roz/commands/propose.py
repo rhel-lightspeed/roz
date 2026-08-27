@@ -2,6 +2,7 @@
 
 import argparse
 
+from roz import utils
 from roz.packages import PACKAGES_MAP
 
 
@@ -57,21 +58,12 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
 
 def run(args: argparse.Namespace) -> None:
     project = PACKAGES_MAP[args.project]
-    forge_branches = project.DIST_GIT_BRANCHES[args.forge]
-    branches = args.branches or forge_branches
-
-    unknown = sorted(set(branches) - set(forge_branches))
-    if unknown:
-        raise SystemExit(
-            f"Unknown branch(es) for goose on {args.forge!r}: "
-            f"{', '.join(unknown)}\n"
-            f"Valid branches: {', '.join(forge_branches)}"
-        )
+    branches = utils.resolve_branches(args.project, project, args.forge, args.branches)
 
     project.propose(
         forge_name=args.forge,
         version=args.version,
-        branches=args.branches,
+        branches=branches,
         offline=args.offline,
         yes=args.yes,
         keep=args.keep,

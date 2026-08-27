@@ -3,6 +3,7 @@
 import argparse
 import logging
 
+from roz import fedpkg
 from roz import koji
 from roz import utils
 from roz.packages import PACKAGES_MAP
@@ -79,6 +80,6 @@ def run(args: argparse.Namespace) -> None:
             arches=arches,
             keep=args.keep,
         )
-    except (koji.AuthenticationError, koji.BuildSubmissionError) as exc:
+    except (fedpkg.AuthenticationError, koji.BuildSubmissionError) as exc:
         logging.debug("fedpkg error details: %s", exc.details)
         raise SystemExit(str(exc)) from None

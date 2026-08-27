@@ -11,6 +11,7 @@ class PackageProtocol(Protocol):
     shared utilities (forge, srpm, git) are called from within.
     """
 
+    NAME: str
     DIST_GIT_BRANCHES: dict[str, list[str]] = {}
     DIST_GIT_URL: dict[str, str] = {}
     UPSTREAM_REPO_URL: str

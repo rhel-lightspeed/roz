@@ -68,7 +68,7 @@ def run(args: argparse.Namespace) -> None:
             ``branches``, ``scratch_build``, ``arches``, ``keep``.
     """
     project = PACKAGES_MAP[args.project]
-    branches = utils.resolve_branches(args.project, project, args.forge, args.branches)
+    branches = utils.resolve_branches(project, args.forge, args.branches)
     arches = " ".join(args.arches) if args.arches else None
 
     try:

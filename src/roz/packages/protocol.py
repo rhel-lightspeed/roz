@@ -20,7 +20,6 @@ class PackageProtocol(Protocol):
     def propose(
         self,
         forge_name: str,
-        version: str,
         offline: bool,
         yes: bool,
         keep: bool,

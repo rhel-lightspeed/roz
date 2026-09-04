@@ -80,8 +80,7 @@ class GoosePackage(PackageProtocol):
             _generate_vendor_tarball(upstream_dir)
             srpm_path = srpm.generate_srpm(upstream_dir)
             version = srpm.version_from_srpm(srpm_path, self.NAME)
-
-        self._open_pull_request(branches, version, forge_name, srpm_path, keep, offline, yes, resolves)
+            self._open_pull_request(branches, version, forge_name, srpm_path, keep, offline, yes, resolves)
 
     def _open_pull_request(
         self,

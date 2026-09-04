@@ -25,6 +25,20 @@ def _generate_vendor_tarball(repo_dir: Path) -> None:
     )
 
 
+def _download_sources(repo_dir: Path, spec_name: str) -> None:
+    """Download source files listed in the spec using spectool.
+
+    Args:
+        repo_dir: Path to the directory containing the spec file.
+        spec_name: Filename of the spec file (e.g. ``"goose.spec"``).
+    """
+    subprocess.run(
+        ["/usr/bin/spectool", "-g", spec_name],
+        cwd=repo_dir,
+        check=True,
+    )
+
+
 class GoosePackage(PackageProtocol):
     """Release workflow for the goose project."""
 
@@ -78,6 +92,7 @@ class GoosePackage(PackageProtocol):
         """
         with git.clone(self.UPSTREAM_REPO_URL, branch="main", keep=keep) as upstream_dir:
             _generate_vendor_tarball(upstream_dir)
+            _download_sources(upstream_dir, f"{self.NAME}.spec")
             srpm_path = srpm.generate_srpm(upstream_dir)
             version = srpm.version_from_srpm(srpm_path, self.NAME)
 

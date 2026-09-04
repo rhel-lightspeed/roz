@@ -33,7 +33,7 @@ class GoosePackage(PackageProtocol):
     RELEASE_TOOL_URL = "https://github.com/rhel-lightspeed/roz"
 
     DIST_GIT_BRANCHES = {
-        "pagure": ["rawhide", "f44", "f43", "epel9", "epel10", "epel10.2"],
+        "pagure": ["rawhide", "f45", "f44", "f43", "epel9", "epel10", "epel10.1", "epel10.2", "epel10.3"],
         "gitlab": ["ext-rhel-10.2", "ext-rhel-9.8"],
     }
 

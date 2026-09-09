@@ -90,7 +90,7 @@ def commit(repo_dir: Path, message: str) -> None:
         message: Commit message.
     """
     subprocess.run(  # noqa: S603
-        [GIT_BIN, "add", "-am", message],
+        [GIT_BIN, "commit", "-am", message],
         cwd=repo_dir,
         check=True,
     )

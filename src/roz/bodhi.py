@@ -22,15 +22,16 @@ class UpdateSubmissionError(Exception):
         super().__init__(f"Failed to submit Bodhi update. Check your Kerberos ticket and dist-git branch state.\n{details}")
 
 
-def run_bodhi(args: list[str], cwd: Path, error_cls: type[Exception]) -> str:
+def run_bodhi(args: list[str], cwd: Path, error_cls: type[Exception]) -> None:
     cmd = BODHI_BIN + args
     result = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True)  # noqa: S603
-    if result.returncode != 0:
+    if result.stderr:
         stderr_lower = result.stderr.lower()
         if any(s in stderr_lower for s in ("kinit", "kerberos", "401", "403", "authentication", "unauthorized")):
             raise AuthenticationError(result.stderr.strip())
         raise error_cls(result.stderr.strip())
-    return result.stdout
+    if result.stdout:
+        print(result.stdout.strip())
 
 
 def update(

@@ -97,8 +97,7 @@ def run(args: argparse.Namespace) -> None:
     if set_of_branches.intersection(bodhi.BODHI_SKIP_BRANCHES):
         raise SystemExit("rawhide do not need a Bodhi update (auto-composed). Remove them from --branch and try again.")
 
-    # Return a new set of all branches, but skip rawhide if it is passed with `--branches`.
-    valid_branches = set_of_branches ^ bodhi.BODHI_SKIP_BRANCHES
+    valid_branches = set_of_branches - bodhi.BODHI_SKIP_BRANCHES
 
     project = PACKAGES_MAP[args.project]
     branches = utils.resolve_branches(project, args.forge, list(valid_branches))

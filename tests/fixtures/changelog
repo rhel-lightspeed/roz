@@ -1,0 +1,148 @@
+* Thu Aug 20 2026 thepetk <thepetk@gmail.com> - 1.45.0-1
+- Update to version 1.45.0
+- Security fix: arbitrary command execution in goose CLI via `goose review` (GHSA-r5pp-p5r8-466r)
+- /status slash command in CLI for session inspection
+- /model slash command for session model switching, with tab completion and provider switching
+- goose review local code review command
+- tui command on goose-cli with diff viewer
+- Hooks system for extensibility (PreToolUse denial, Stop hook context)
+- Global hints loading from ~/.agents/AGENTS.md
+- Structured summary output with template rendering for compaction
+- Configurable GOOSE_DOCS_ROOT for air-gapped docs access
+- Allow disabling built-in skills
+- Option to disable automatic update downloads
+- Track cache tokens and per-message usage/cost stats
+- Unified thinking effort control across providers; Opus 5 adaptive thinking support
+- Upgrade to rmcp 2.0
+- New providers: Together AI, EmpirioLabs, OrcaRouter, NEAR AI Cloud, Perplexity, Alibaba (Qwen via DashScope), Databricks AI Gateway, Scaleway, Vercel AI Gateway, xAI SuperGrok, iFlytek Spark/Astron MaaS, Fireworks AI, OllamaCloudProvider, Sakana AI
+- MLX support for local inference provider
+- Nushell terminal and completion support
+- Azure Entra ID bearer token auth via AZURE_OPENAI_AD_TOKEN
+- Accept string values for GOOSE_CONTEXT_LIMIT
+- Quarterly option for scheduler
+- Worktree-aware directory switcher
+- Restore dynamic model discovery and current Grok support
+- Update DeepSeek model names to v4 API
+- Gate rcgen aws_lc_rs feature behind rustls-tls
+- Fail closed on unverifiable update provenance
+- Bump nostr to 0.44.6 to clear RUSTSEC-2026-0216
+- Numerous provider, ACP, local-inference, and session-handling bug fixes
+ 
+* Thu Jun 25 2026 thepetk <thepetk@gmail.com> - 1.39.0-1
+- Update to version 1.39.0
+- /status slash command in CLI for session inspection
+- ACP method for managing recipes and session extensions
+- Typed request/response for add/get session extensions in ACP
+- Load session using ACP
+- Elicitation method for ACP with improvements
+- Elicitation decline and cancel actions propagation
+- Recipe handling in new_session
+- Use ACP to manage global config and session extensions
+- Change working directory using ACP
+- ACP cancel race condition fix
+- Load global hints from ~/.agents/AGENTS.md
+- Azure Entra ID bearer token auth via AZURE_OPENAI_AD_TOKEN
+- Track cache tokens for accurate cost reporting
+- Quarterly option for scheduler
+- Option to disable automatic update downloads
+- Accept string values for GOOSE_CONTEXT_LIMIT
+- EmpirioLabs as a declarative OpenAI-compatible provider
+- OrcaRouter as a declarative OpenAI-compatible provider
+- Together AI declarative provider
+- Add option for overriding API URL for Moonshot provider
+- MCP extensions support in open plugins
+- Peek mode for async background tasks in summon
+- Context, working_dir, and metadata parameters for summon delegate tasks
+- Move OpenAI provider and API client into goose-providers crate
+- Delete embeddings support (unused)
+- Accept JSON-encoded string for autovisualiser data parameter
+- Send User-Agent on URL image fetches in developer/read_image
+- Allow unlisted models in search
+- Do not pass temperature to ChatGPT Codex provider
+- Sanitize extension environment maps
+- Refresh provider when session working directory changes
+- Use refreshed gcloud token after reauth (retry Vertex AI on 401/403)
+- Start a turn when /goal or /grind is set
+- Dedupe duplicate tool-call ids within a turn
+- Resolve bundled extensions from discovery
+- Custom OpenAI provider dropping port when URL scheme is omitted
+- Clear rejected OAuth credentials after refresh
+- Keep extended thinking within the Anthropic output cap
+- Preserve custom API path in OpenAI base_url derivation
+- Repair PATH for plugin hook commands
+- Fall back to default provider when resuming session with unavailable provider
+- Read meta.n_ctx from /v1/models to fix context limit for local OpenAI servers
+- Show resolved skill supporting file paths
+- Record OpenAI-native cached_tokens in usage metering
+- Detect image paths with spaces
+- Ensure tool request timestamp precedes tool response timestamp
+- Inherit login-shell PATH in spawned subagents
+- Skip non-recipe project config files in summon
+- Evict stale completed tasks to prevent unbounded memory growth in summon
+- Warn on unmatched extension names in summon delegate
+- Make context exceeded checker more precise
+- Include agentInfo in ACP initialize response
+- Check for responses API support in Databricks
+ 
+* Wed Jun 17 2026 Sam Doran <sdoran@redhat.com> - 1.38.0-1
+- Update to version 1.38.0
+- Canonical thinking modes across providers
+- Surface Anthropic stream refusals as visible errors
+- ACP secret key support at goose serve endpoint
+- Unified OTLP logging schema for cross-tool detection
+- Opt-in ACP last message snippets for sessions
+- Custom ACP method to get session info
+- Steering messages with ACP
+- ACP list sessions with keyword and type filter
+- ACP thinking effort config option
+- Image read tool
+- ACP methods for config extensions
+- Custom notifications only when ACP client specifies capability
+- Session import functionality
+- Replay ACP images on session load
+- Raw provider supported models over ACP
+- ACP session system prompt setter
+- Perplexity as declarative OpenAI-compatible provider
+- Alibaba (Qwen via DashScope) declarative provider
+- Configurable tool output size limit via GOOSE_MAX_TOOL_RESPONSE_SIZE
+- /model slash command in CLI for session model switching
+- Databricks AI Gateway provider
+- Expose built-in skills through sources list ACP calls
+- Replace raw config and secret methods in ACP
+- Support Google model inventory refresh
+- Correctly map ollama_cloud to canonical provider and update max tokens
+- Incorrect max tokens values for Groq provider
+- Classify Bedrock ValidationException as ExecutionError
+- Page through all Databricks AI Gateway v2 endpoints when listing models
+- Preserve unparseable extension entries during config refresh
+- Forward ACP server context window size to clients
+- Skip OTLP signals when protocol=grpc to avoid background-thread panic
+- Make Azure api-version query param optional
+- Stricter GGUF requirements, auto detection of tool calling support, fixed thinking output parsing
+- Remove unused fetch-metadata IPC handler (SSRF)
+- Replace Venice custom provider with declarative config
+- Coalesce streaming chunks under one message id in ACP
+- Require extension_name on read_resource
+- Seed provider handoff history in ACP
+- Handle ACP requests concurrently
+- Mark stream decode errors retryable
+- Create goose-providers crate with canonical models and types
+- ACP session setup refactor
+- LRU cache for token counting
+- Replace review subprocess timeout with turn limits
+- Honor blocking Stop hook decisions
+- Forward custom headers through OAuth connect path
+- Prefer goose aliases for Databricks v2 inventory
+- Mount ACP in goosed server for iterative migration
+- Remove threads layer, use sessions directly for ACP
+- Install plugins to ~/.agents/plugins
+- Switch to official new rust-sdk for ACP
+- Install plugins support
+- Deduplicate _goose/providers/list RPC call at startup
+- Translate ACP host capabilities into MCP initialization
+- Prompt injection mitigation enabled by default for internal users
+- Re-adjust pattern-based detection confidence scores
+- Add directionality to egress logging
+- Scheduled recipe session params
+- Unscheduling a recipe should not delete them
+- Read prompted file parameters in recipes

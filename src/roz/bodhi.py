@@ -3,6 +3,7 @@
 from pathlib import Path
 
 from roz.fedpkg import run_fedpkg
+from roz.utils import truncate_changelog
 
 
 # Updates to rawhide are done automatically after builds to that target are successful.
@@ -14,7 +15,7 @@ class UpdateSubmissionError(Exception):
 
     def __init__(self, details: str) -> None:
         self.details = details
-        super().__init__("Failed to submit Bodhi update. Check your Kerberos ticket and dist-git branch state.")
+        super().__init__(f"Failed to submit Bodhi update. Check your Kerberos ticket and dist-git branch state.\n{details}")
 
 
 def update(
@@ -44,6 +45,8 @@ def update(
         AuthenticationError: If the failure looks like an auth/connectivity issue.
         UpdateSubmissionError: For any other update submission failure.
     """
+    truncate_changelog(repo_dir / "changelog")
+
     args = [
         "update",
         "--type",

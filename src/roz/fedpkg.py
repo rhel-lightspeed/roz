@@ -16,7 +16,7 @@ class AuthenticationError(Exception):
     def __init__(self, details: str) -> None:
         self.details = details
         super().__init__(
-            "Authentication failure. Run `fkinit -u <your-user>` to get a valid Kerberos ticket and try again."
+            f"Authentication failure. Run `fkinit -u <your-user>` to get a valid Kerberos ticket and try again.\n{details}"
         )
 
 

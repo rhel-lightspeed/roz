@@ -219,7 +219,7 @@ class GoosePackage(PackageProtocol):
                 non-rawhide pagure branches are targeted.
         """
         url = self.DIST_GIT_URLS["pagure"]
-        with git.clone(url, shallow=True) as distgit_dir:
+        with git.clone(url, shallow=False) as distgit_dir:
             for branch in branches:
                 git.checkout(distgit_dir, branch)
                 bodhi.update(distgit_dir, update_type, severity, bugs, stable_karma)

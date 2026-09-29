@@ -56,7 +56,8 @@ def resolve_branches(
     Raises:
         SystemExit: If any requested branch is not in the workflow's valid set.
     """
-    valid: list[str] = project.DIST_GIT_BRANCHES[forge_name]
+    forge_branches = project.DIST_GIT_BRANCHES[forge_name]
+    valid: list[str] = list(forge_branches.keys()) if isinstance(forge_branches, dict) else forge_branches
     branches = requested or valid
 
     unknown = sorted(set(branches) - set(valid))

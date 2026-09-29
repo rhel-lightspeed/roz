@@ -52,14 +52,6 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
         help="Limit to specific branch(es). May be repeated. Default: all.",
     )
     parser.add_argument(
-        "--build",
-        action="append",
-        dest="builds",
-        metavar="NVR",
-        required=True,
-        help="Koji build NVR to submit to Bodhi (e.g. goose-1.45.0-1.fc45). May be repeated.",
-    )
-    parser.add_argument(
         "--stable-karma",
         type=int,
         default=1,
@@ -83,7 +75,7 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
     parser.add_argument(
         "--notes",
         default=None,
-        help="Update notes. Overrides the changelog file when provided.",
+        help="Update notes. When not present, a short message gotten from the build NVR is used.",
     )
     parser.set_defaults(handler=run)
 
@@ -107,7 +99,6 @@ def run(args: argparse.Namespace) -> None:
         severity=args.severity,
         bugs=args.bugs,
         branches=branches,
-        builds=args.builds,
         notes=args.notes,
         stable_karma=args.stable_karma,
         unstable_karma=args.unstable_karma,

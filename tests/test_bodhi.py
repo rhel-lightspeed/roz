@@ -6,17 +6,10 @@ from roz.bodhi import UpdateSubmissionError, update
 from roz.fedpkg import AuthenticationError
 
 
-FIXTURE_NOTES = "* Thu Aug 20 2026 thepetk <thepetk@gmail.com> - 1.45.0-1\n- Update to version 1.45.0\n"
 KOJI_BUILD = "goose-1.45.0-1.fc45"
 
 
-def make_repo(tmp_path, notes: str = FIXTURE_NOTES) -> None:
-    (tmp_path / "changelog").write_text(notes, encoding="utf-8")
-    return tmp_path
-
-
 def test_update_passes_notes_arg_when_provided(tmp_path):
-    make_repo(tmp_path)
     with patch("roz.bodhi.run_bodhi") as mock_run:
         update(tmp_path, "enhancement", "unspecified", KOJI_BUILD, notes="custom notes")
     args = mock_run.call_args[0][0]
@@ -24,16 +17,7 @@ def test_update_passes_notes_arg_when_provided(tmp_path):
     assert args[args.index("--notes") + 1] == "custom notes"
 
 
-def test_update_reads_changelog_when_notes_not_provided(tmp_path):
-    make_repo(tmp_path, notes=FIXTURE_NOTES)
-    with patch("roz.bodhi.run_bodhi") as mock_run:
-        update(tmp_path, "enhancement", "unspecified", KOJI_BUILD)
-    args = mock_run.call_args[0][0]
-    assert args[args.index("--notes") + 1] == FIXTURE_NOTES
-
-
 def test_update_appends_koji_build_as_last_arg(tmp_path):
-    make_repo(tmp_path)
     with patch("roz.bodhi.run_bodhi") as mock_run:
         update(tmp_path, "enhancement", "unspecified", KOJI_BUILD, notes="n")
     args = mock_run.call_args[0][0]
@@ -41,7 +25,6 @@ def test_update_appends_koji_build_as_last_arg(tmp_path):
 
 
 def test_update_includes_required_bodhi_flags(tmp_path):
-    make_repo(tmp_path)
     with patch("roz.bodhi.run_bodhi") as mock_run:
         update(tmp_path, "enhancement", "unspecified", KOJI_BUILD, notes="n",
                stable_karma=2, unstable_karma=-2, stable_days=14)
@@ -56,12 +39,12 @@ def test_update_includes_required_bodhi_flags(tmp_path):
 
 
 def test_update_appends_bugs_when_provided(tmp_path):
-    make_repo(tmp_path)
     with patch("roz.bodhi.run_bodhi") as mock_run:
         update(tmp_path, "enhancement", "unspecified", KOJI_BUILD, notes="n", bugs=["2514571"])
     args = mock_run.call_args[0][0]
     assert "--bugs" in args
     assert "2514571" in args
+    assert args[-1] == KOJI_BUILD
 
 
 def test_run_bodhi_raises_auth_error_on_kerberos_signal(tmp_path):
@@ -81,9 +64,9 @@ def test_run_bodhi_raises_update_error_on_other_failure(tmp_path):
         assert "goose-1.45.0-2.fc45" in str(exc.value)
 
 
-def test_run_bodhi_returns_stdout_on_success(tmp_path):
-    result = MagicMock(returncode=0, stdout="Update created: FEDORA-2026-abc123\n")
+def test_run_bodhi_prints_stdout_on_success(tmp_path, capsys):
+    result = MagicMock(returncode=0, stdout="Update created: FEDORA-2026-abc123\n", stderr="")
     with patch("subprocess.run", return_value=result):
         from roz.bodhi import run_bodhi
-        out = run_bodhi(["updates", "new"], tmp_path, error_cls=UpdateSubmissionError)
-    assert "FEDORA-2026-abc123" in out
+        run_bodhi(["updates", "new"], tmp_path, error_cls=UpdateSubmissionError)
+    assert "FEDORA-2026-abc123" in capsys.readouterr().out

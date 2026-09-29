@@ -5,7 +5,6 @@ import subprocess
 from pathlib import Path
 
 from roz.fedpkg import AuthenticationError
-from roz.utils import truncate_changelog
 
 
 BODHI_BIN: list[str] = ["/usr/bin/bodhi"]
@@ -35,11 +34,11 @@ def run_bodhi(args: list[str], cwd: Path, error_cls: type[Exception]) -> None:
 
 
 def update(
-    repo_dir: Path,
+    cwd: Path,
     update_type: str,
     severity: str,
     koji_build: str,
-    notes: str | None = None,
+    notes: str,
     bugs: list[str] | None = None,
     stable_karma: int = 1,
     unstable_karma: int = -3,
@@ -48,14 +47,13 @@ def update(
     """Submit a Bodhi update via ``bodhi updates new``.
 
     Args:
-        repo_dir: Path to the dist-git repository checkout (on the target branch).
+        cwd: Working directory for the bodhi subprocess.
         update_type: Bodhi update type (e.g. ``"enhancement"``, ``"bugfix"``,
             ``"security"``).
         severity: Bodhi severity level (e.g. ``"unspecified"``, ``"low"``,
             ``"medium"``, ``"high"``, ``"urgent"``).
         koji_build: Koji build NVR to submit (e.g. ``goose-1.45.0-1.fc45``).
-        notes: Update notes. When ``None``, the ``changelog`` file in the
-            dist-git checkout is used.
+        notes: Update notes shown in Bodhi.
         bugs: Optional list of bug IDs to associate with the update.
         stable_karma: Stable karma threshold (default: 1).
         unstable_karma: Unstable karma threshold (default: -3).
@@ -65,10 +63,6 @@ def update(
         AuthenticationError: If the failure looks like an auth/connectivity issue.
         UpdateSubmissionError: For any other update submission failure.
     """
-    if notes is None:
-        truncate_changelog(repo_dir / "changelog")
-        notes = (repo_dir / "changelog").read_text(encoding="utf-8")
-
     args = [
         "updates", "new",
         "--type", update_type,
@@ -80,9 +74,8 @@ def update(
         "--autokarma",
         "--stable-karma", str(stable_karma),
         "--unstable-karma", str(unstable_karma),
+        *(["--bugs"] + bugs if bugs else []),
+        koji_build,
     ]
-    if bugs:
-        args.extend(["--bugs"] + bugs)
-    args.append(koji_build)
 
-    run_bodhi(args, repo_dir, error_cls=UpdateSubmissionError)
+    run_bodhi(args, cwd, error_cls=UpdateSubmissionError)

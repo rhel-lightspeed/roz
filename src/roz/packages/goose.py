@@ -33,19 +33,21 @@ class GoosePackage(PackageProtocol):
     RELEASE_TOOL_URL = "https://github.com/rhel-lightspeed/roz"
 
     DIST_GIT_BRANCHES = {
-        "pagure": ["rawhide", "f45", "f44", "f43", "epel9", "epel10", "epel10.1", "epel10.2", "epel10.3"],
-        "gitlab": ["ext-rhel-10.2", "ext-rhel-9.8"],
-    }
-
-    BRANCH_DIST = {
-        "f43": "fc43",
-        "f44": "fc44",
-        "f45": "fc45",
-        "epel9": "el9",
-        "epel10": "el10",
-        "epel10.1": "el10_1",
-        "epel10.2": "el10_2",
-        "epel10.3": "el10_3",
+        "pagure": {
+            "rawhide": None,
+            "f45": "fc45",
+            "f44": "fc44",
+            "f43": "fc43",
+            "epel9": "el9",
+            "epel10": "el10",
+            "epel10.1": "el10_1",
+            "epel10.2": "el10_2",
+            "epel10.3": "el10_3",
+        },
+        "gitlab": {
+            "ext-rhel-10.2": None,
+            "ext-rhel-9.8": None,
+        },
     }
 
     UPSTREAM_REPO_URL = "git@github.com:rhel-lightspeed/goose.git"
@@ -61,7 +63,7 @@ class GoosePackage(PackageProtocol):
         offline: bool = False,
         yes: bool = False,
         keep: bool = False,
-        branches: list[str] = DIST_GIT_BRANCHES["pagure"],
+        branches: list[str] = list(DIST_GIT_BRANCHES["pagure"].keys()),
         resolves: list[str] | None = None,
     ) -> None:
         """Clone upstream, build an SRPM, and open dist-git PRs for each target branch.
@@ -212,7 +214,6 @@ class GoosePackage(PackageProtocol):
         severity: str,
         bugs: list[str] | None,
         branches: list[str],
-        builds: list[str],
         notes: str | None,
         stable_karma: int,
         unstable_karma: int,
@@ -220,8 +221,8 @@ class GoosePackage(PackageProtocol):
     ) -> None:
         """Stage 3: create Bodhi updates for all non-rawhide pagure branches.
 
-        Clones the pagure dist-git (full) and runs ``bodhi updates new`` on each
-        target branch using the provided Koji build NVRs.
+        Queries Koji for the latest build NVR per branch and runs
+        ``bodhi updates new`` for each.
 
         Args:
             update_type: Bodhi update type (e.g. ``"enhancement"``, ``"bugfix"``,
@@ -229,17 +230,14 @@ class GoosePackage(PackageProtocol):
             severity: Bodhi severity level (e.g. ``"unspecified"``, ``"urgent"``).
             bugs: Optional list of bug IDs to associate with the updates.
             branches: Dist-git branches to submit updates for.
-            builds: Explicit Koji build NVRs (e.g. ``goose-1.45.0-1.fc45``).
+            notes: Optional update notes. When ``None``, a short message derived
+                from the build NVR is used.
+            stable_karma: Stable karma threshold.
+            unstable_karma: Unstable karma threshold.
+            stable_days: Days in testing before auto-promotion.
         """
-        url = self.DIST_GIT_URLS["pagure"]
-        with git.clone(url, shallow=False) as distgit_dir:
-            for branch in branches:
-                dist = self.BRANCH_DIST.get(branch)
-                if dist is None:
-                    raise SystemExit(f"No dist tag mapping for branch {branch!r}.")
-                koji_build = next((b for b in builds if b.endswith(f".{dist}")), None)
-                if koji_build is None:
-                    raise SystemExit(f"No build provided for branch {branch!r} (expected suffix .{dist}).")
-                git.checkout(distgit_dir, branch)
-                bodhi.update(distgit_dir, update_type, severity, koji_build, notes, bugs, stable_karma, unstable_karma, stable_days)
-                print(f"[{branch}] Bodhi update submitted: {koji_build}")
+        for branch in branches:
+            koji_build = koji.latest_build(self.NAME, f"{branch}-build")
+            update_notes = notes or f"Update to {koji_build}."
+            bodhi.update(Path.cwd(), update_type, severity, koji_build, update_notes, bugs, stable_karma, unstable_karma, stable_days)
+            print(f"[{branch}] Bodhi update submitted: {koji_build}")

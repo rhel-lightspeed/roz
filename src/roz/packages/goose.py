@@ -241,7 +241,14 @@ class GoosePackage(PackageProtocol):
             koji_build = koji.latest_build(self.NAME, f"{branch}-build")
             update_notes = notes or f"Update to {koji_build}."
             bodhi.update(
-                Path.cwd(), update_type, severity, koji_build,
-                update_notes, bugs, stable_karma, unstable_karma, stable_days,
+                Path.cwd(),
+                update_type,
+                severity,
+                koji_build,
+                update_notes,
+                bugs,
+                stable_karma,
+                unstable_karma,
+                stable_days,
             )
             print(f"[{branch}] Bodhi update submitted: {koji_build}")

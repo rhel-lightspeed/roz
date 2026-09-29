@@ -26,8 +26,16 @@ def test_update_appends_koji_build_as_last_arg(tmp_path):
 
 def test_update_includes_required_bodhi_flags(tmp_path):
     with patch("roz.bodhi.run_bodhi") as mock_run:
-        update(tmp_path, "enhancement", "unspecified", KOJI_BUILD, notes="n",
-               stable_karma=2, unstable_karma=-2, stable_days=14)
+        update(
+            tmp_path,
+            "enhancement",
+            "unspecified",
+            KOJI_BUILD,
+            notes="n",
+            stable_karma=2,
+            unstable_karma=-2,
+            stable_days=14,
+        )
     args = mock_run.call_args[0][0]
     assert args[:2] == ["updates", "new"]
     assert "--request" in args and args[args.index("--request") + 1] == "testing"
@@ -52,6 +60,7 @@ def test_run_bodhi_raises_auth_error_on_kerberos_signal(tmp_path):
     with patch("subprocess.run", return_value=result):
         with pytest.raises(AuthenticationError):
             from roz.bodhi import run_bodhi
+
             run_bodhi(["updates", "new"], tmp_path, error_cls=UpdateSubmissionError)
 
 
@@ -60,6 +69,7 @@ def test_run_bodhi_raises_update_error_on_other_failure(tmp_path):
     with patch("subprocess.run", return_value=result):
         with pytest.raises(UpdateSubmissionError) as exc:
             from roz.bodhi import run_bodhi
+
             run_bodhi(["updates", "new"], tmp_path, error_cls=UpdateSubmissionError)
         assert "goose-1.45.0-2.fc45" in str(exc.value)
 
@@ -68,5 +78,6 @@ def test_run_bodhi_prints_stdout_on_success(tmp_path, capsys):
     result = MagicMock(returncode=0, stdout="Update created: FEDORA-2026-abc123\n", stderr="")
     with patch("subprocess.run", return_value=result):
         from roz.bodhi import run_bodhi
+
         run_bodhi(["updates", "new"], tmp_path, error_cls=UpdateSubmissionError)
     assert "FEDORA-2026-abc123" in capsys.readouterr().out

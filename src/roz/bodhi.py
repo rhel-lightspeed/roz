@@ -19,8 +19,7 @@ class UpdateSubmissionError(Exception):
     def __init__(self, details: str) -> None:
         self.details = details
         super().__init__(
-            f"Failed to submit Bodhi update. "
-            f"Check your Kerberos ticket and dist-git branch state.\n{details}"
+            f"Failed to submit Bodhi update. Check your Kerberos ticket and dist-git branch state.\n{details}"
         )
 
 
@@ -67,16 +66,24 @@ def update(
         UpdateSubmissionError: For any other update submission failure.
     """
     args = [
-        "updates", "new",
-        "--type", update_type,
-        "--severity", severity,
-        "--notes", notes,
-        "--request", "testing",
+        "updates",
+        "new",
+        "--type",
+        update_type,
+        "--severity",
+        severity,
+        "--notes",
+        notes,
+        "--request",
+        "testing",
         "--autotime",
-        "--stable-days", str(stable_days),
+        "--stable-days",
+        str(stable_days),
         "--autokarma",
-        "--stable-karma", str(stable_karma),
-        "--unstable-karma", str(unstable_karma),
+        "--stable-karma",
+        str(stable_karma),
+        "--unstable-karma",
+        str(unstable_karma),
         *(["--bugs"] + bugs if bugs else []),
         koji_build,
     ]

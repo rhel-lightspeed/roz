@@ -72,6 +72,7 @@ def test_oversized_single_entry_is_hard_truncated(tmp_path):
 # resolve_branches
 # ---------------------------------------------------------------------------
 
+
 def _project(name: str, branches: list[str], forge: str = "pagure") -> MagicMock:
     p = MagicMock()
     p.NAME = name

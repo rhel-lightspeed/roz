@@ -7,6 +7,7 @@ import itertools
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+
 if TYPE_CHECKING:
     from roz.packages.protocol import PackageProtocol
 
@@ -27,13 +28,13 @@ def truncate_changelog(path: Path) -> None:
         return
 
     lines = iter(text.splitlines(keepends=True))
-    first_header = next((l for l in lines if l.startswith("* ")), None)
+    first_header = next((line for line in lines if line.startswith("* ")), None)
 
     if first_header is None:
         path.write_text(text[:_BODHI_NOTES_MAX], encoding="utf-8")
         return
 
-    body = itertools.takewhile(lambda l: not l.startswith("* "), lines)
+    body = itertools.takewhile(lambda line: not line.startswith("* "), lines)
     path.write_text((first_header + "".join(body))[:_BODHI_NOTES_MAX], encoding="utf-8")
 
 

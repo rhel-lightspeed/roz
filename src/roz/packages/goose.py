@@ -63,7 +63,7 @@ class GoosePackage(PackageProtocol):
         offline: bool = False,
         yes: bool = False,
         keep: bool = False,
-        branches: list[str] = list(DIST_GIT_BRANCHES["pagure"].keys()),
+        branches: list[str] | None = None,
         resolves: list[str] | None = None,
     ) -> None:
         """Clone upstream, build an SRPM, and open dist-git PRs for each target branch.
@@ -89,6 +89,7 @@ class GoosePackage(PackageProtocol):
             resolves: Bug or ticket identifiers to append as ``Resolve: <id>``
                 trailers in the commit message (e.g. ``['rhbz#12345', 'RSPEED-12345']``).
         """
+        branches = branches or list(self.DIST_GIT_BRANCHES["pagure"].keys())
         with git.clone(self.UPSTREAM_REPO_URL, branch="main", keep=keep) as upstream_dir:
             _generate_vendor_tarball(upstream_dir)
             srpm_path = srpm.generate_srpm(upstream_dir)
@@ -239,5 +240,8 @@ class GoosePackage(PackageProtocol):
         for branch in branches:
             koji_build = koji.latest_build(self.NAME, f"{branch}-build")
             update_notes = notes or f"Update to {koji_build}."
-            bodhi.update(Path.cwd(), update_type, severity, koji_build, update_notes, bugs, stable_karma, unstable_karma, stable_days)
+            bodhi.update(
+                Path.cwd(), update_type, severity, koji_build,
+                update_notes, bugs, stable_karma, unstable_karma, stable_days,
+            )
             print(f"[{branch}] Bodhi update submitted: {koji_build}")

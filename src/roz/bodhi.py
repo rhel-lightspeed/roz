@@ -18,7 +18,10 @@ class UpdateSubmissionError(Exception):
 
     def __init__(self, details: str) -> None:
         self.details = details
-        super().__init__(f"Failed to submit Bodhi update. Check your Kerberos ticket and dist-git branch state.\n{details}")
+        super().__init__(
+            f"Failed to submit Bodhi update. "
+            f"Check your Kerberos ticket and dist-git branch state.\n{details}"
+        )
 
 
 def run_bodhi(args: list[str], cwd: Path, error_cls: type[Exception]) -> None:

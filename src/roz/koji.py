@@ -1,4 +1,5 @@
 import re
+import subprocess
 
 from pathlib import Path
 
@@ -6,6 +7,39 @@ from roz.fedpkg import run_fedpkg
 
 
 _TASK_URL_RE = re.compile(r"https?://\S+taskinfo\S+")
+
+KOJI_BIN: list[str] = ["/usr/bin/koji"]
+
+
+class LatestBuildError(Exception):
+    """Raised when koji fails to return the latest build for a package/tag."""
+
+    def __init__(self, details: str) -> None:
+        self.details = details
+        super().__init__(f"Failed to find the latest Koji build.\n{details}")
+
+
+def latest_build(package: str, tag: str) -> str:
+    """Return the latest build NVR for *package* in the given koji *tag*.
+
+    Args:
+        package: Package name (e.g. ``"goose"``).
+        tag: Koji build tag to query (e.g. ``"f45-build"``).
+
+    Returns:
+        The NVR string of the latest build (e.g. ``"goose-1.45.0-1.fc45"``).
+
+    Raises:
+        LatestBuildError: If koji returns a non-zero exit code or no build is found.
+    """
+    cmd = KOJI_BIN + ["latest-build", tag, package]
+    result = subprocess.run(cmd, capture_output=True, text=True)  # noqa: S603
+    if result.returncode != 0:
+        raise LatestBuildError(result.stderr.strip())
+    lines = result.stdout.strip().splitlines()
+    if len(lines) < 3:
+        raise LatestBuildError(f"No build found for {package!r} in koji tag {tag!r}.")
+    return lines[2].split()[0]
 
 
 class BuildSubmissionError(Exception):

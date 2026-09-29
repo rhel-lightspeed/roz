@@ -12,7 +12,7 @@ class PackageProtocol(Protocol):
     """
 
     NAME: str
-    DIST_GIT_BRANCHES: dict[str, list[str]] = {}
+    DIST_GIT_BRANCHES: dict[str, dict[str, str | None]] = {}
     DIST_GIT_URL: dict[str, str] = {}
     UPSTREAM_REPO_URL: str
     BODHI_SKIP_BRANCHES: set[str] = set()
@@ -44,6 +44,9 @@ class PackageProtocol(Protocol):
         severity: str,
         bugs: list[str] | None,
         branches: list[str],
+        notes: str | None,
         stable_karma: int,
+        unstable_karma: int,
+        stable_days: int,
     ) -> None:
         """Stage 3: create Bodhi updates."""

@@ -33,8 +33,21 @@ class GoosePackage(PackageProtocol):
     RELEASE_TOOL_URL = "https://github.com/rhel-lightspeed/roz"
 
     DIST_GIT_BRANCHES = {
-        "pagure": ["rawhide", "f45", "f44", "f43", "epel9", "epel10", "epel10.1", "epel10.2", "epel10.3"],
-        "gitlab": ["ext-rhel-10.2", "ext-rhel-9.8"],
+        "pagure": {
+            "rawhide": None,
+            "f45": "fc45",
+            "f44": "fc44",
+            "f43": "fc43",
+            "epel9": "el9",
+            "epel10": "el10",
+            "epel10.1": "el10_1",
+            "epel10.2": "el10_2",
+            "epel10.3": "el10_3",
+        },
+        "gitlab": {
+            "ext-rhel-10.2": None,
+            "ext-rhel-9.8": None,
+        },
     }
 
     UPSTREAM_REPO_URL = "git@github.com:rhel-lightspeed/goose.git"
@@ -50,7 +63,7 @@ class GoosePackage(PackageProtocol):
         offline: bool = False,
         yes: bool = False,
         keep: bool = False,
-        branches: list[str] = DIST_GIT_BRANCHES["pagure"],
+        branches: list[str] | None = None,
         resolves: list[str] | None = None,
     ) -> None:
         """Clone upstream, build an SRPM, and open dist-git PRs for each target branch.
@@ -76,6 +89,7 @@ class GoosePackage(PackageProtocol):
             resolves: Bug or ticket identifiers to append as ``Resolve: <id>``
                 trailers in the commit message (e.g. ``['rhbz#12345', 'RSPEED-12345']``).
         """
+        branches = branches or list(self.DIST_GIT_BRANCHES["pagure"].keys())
         with git.clone(self.UPSTREAM_REPO_URL, branch="main", keep=keep) as upstream_dir:
             _generate_vendor_tarball(upstream_dir)
             srpm_path = srpm.generate_srpm(upstream_dir)
@@ -201,26 +215,40 @@ class GoosePackage(PackageProtocol):
         severity: str,
         bugs: list[str] | None,
         branches: list[str],
+        notes: str | None,
         stable_karma: int,
+        unstable_karma: int,
+        stable_days: int,
     ) -> None:
         """Stage 3: create Bodhi updates for all non-rawhide pagure branches.
 
-        Clones the pagure dist-git (shallow) and runs ``fedpkg update`` on each
-        target branch, using the ``changelog`` file as the update notes.
-        Rawhide is always excluded: it is auto-composed and does not need a
-        Bodhi update.
+        Queries Koji for the latest build NVR per branch and runs
+        ``bodhi updates new`` for each.
 
         Args:
             update_type: Bodhi update type (e.g. ``"enhancement"``, ``"bugfix"``,
                 ``"security"``).
             severity: Bodhi severity level (e.g. ``"unspecified"``, ``"urgent"``).
             bugs: Optional list of bug IDs to associate with the updates.
-            branches: Explicit branch list from ``--branch``. When ``None``, all
-                non-rawhide pagure branches are targeted.
+            branches: Dist-git branches to submit updates for.
+            notes: Optional update notes. When ``None``, a short message derived
+                from the build NVR is used.
+            stable_karma: Stable karma threshold.
+            unstable_karma: Unstable karma threshold.
+            stable_days: Days in testing before auto-promotion.
         """
-        url = self.DIST_GIT_URLS["pagure"]
-        with git.clone(url, shallow=True) as distgit_dir:
-            for branch in branches:
-                git.checkout(distgit_dir, branch)
-                bodhi.update(distgit_dir, update_type, severity, bugs, stable_karma)
-                print(f"[{branch}] Bodhi update submitted.")
+        for branch in branches:
+            koji_build = koji.latest_build(self.NAME, f"{branch}-build")
+            update_notes = notes or f"Update to {koji_build}."
+            bodhi.update(
+                Path.cwd(),
+                update_type,
+                severity,
+                koji_build,
+                update_notes,
+                bugs,
+                stable_karma,
+                unstable_karma,
+                stable_days,
+            )
+            print(f"[{branch}] Bodhi update submitted: {koji_build}")

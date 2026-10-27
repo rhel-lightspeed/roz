@@ -41,8 +41,8 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
     parser.add_argument(
         "--severity",
         choices=["unspecified", "low", "medium", "high", "urgent"],
-        default="low",
-        help="Bodhi severity (default: low).",
+        default="unspecified",
+        help="Bodhi severity (default: unspecified).",
     )
     parser.add_argument(
         "--branch",
@@ -58,6 +58,25 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
         metavar="KARMA",
         help="Stable karma threshold (default: 1, minimum: 1).",
     )
+    parser.add_argument(
+        "--unstable-karma",
+        type=int,
+        default=-3,
+        metavar="KARMA",
+        help="Unstable karma threshold (default: -3).",
+    )
+    parser.add_argument(
+        "--stable-days",
+        type=int,
+        default=7,
+        metavar="DAYS",
+        help="Days in testing before auto-promotion (default: 7).",
+    )
+    parser.add_argument(
+        "--notes",
+        default=None,
+        help="Update notes. When not present, a short message gotten from the build NVR is used.",
+    )
     parser.set_defaults(handler=run)
 
 
@@ -70,8 +89,7 @@ def run(args: argparse.Namespace) -> None:
     if set_of_branches.intersection(bodhi.BODHI_SKIP_BRANCHES):
         raise SystemExit("rawhide do not need a Bodhi update (auto-composed). Remove them from --branch and try again.")
 
-    # Return a new set of all branches, but skip rawhide if it is passed with `--branches`.
-    valid_branches = set_of_branches ^ bodhi.BODHI_SKIP_BRANCHES
+    valid_branches = set_of_branches - bodhi.BODHI_SKIP_BRANCHES
 
     project = PACKAGES_MAP[args.project]
     branches = utils.resolve_branches(project, args.forge, list(valid_branches))
@@ -81,5 +99,8 @@ def run(args: argparse.Namespace) -> None:
         severity=args.severity,
         bugs=args.bugs,
         branches=branches,
+        notes=args.notes,
         stable_karma=args.stable_karma,
+        unstable_karma=args.unstable_karma,
+        stable_days=args.stable_days,
     )

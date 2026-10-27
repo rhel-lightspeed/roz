@@ -25,6 +25,7 @@ class PackageProtocol(Protocol):
         keep: bool,
         branches: list[str],
         resolves: list[str] | None,
+        title: str | None = None,
     ) -> None:
         """Stage 1: generate SRPM, import SRPM, open dist-git PRs."""
 

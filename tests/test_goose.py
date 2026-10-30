@@ -106,8 +106,8 @@ def test_update_queries_koji_per_branch(goose):
     ):
         goose.update("enhancement", "unspecified", None, ["f45", "f44"], None, 1, -3, 7)
     assert mock_koji.call_args_list == [
-        call("goose", "f45-build"),
-        call("goose", "f44-build"),
+        call("goose", "f45-testing"),
+        call("goose", "f44-testing"),
     ]
 
 

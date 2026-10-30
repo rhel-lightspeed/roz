@@ -8,10 +8,6 @@ import pytest
 from roz.utils import _BODHI_NOTES_MAX, resolve_branches, truncate_changelog
 
 
-# ---------------------------------------------------------------------------
-# truncate_changelog
-# ---------------------------------------------------------------------------
-
 FIXTURE = Path(__file__).parent / "fixtures" / "changelog"
 
 # Enough old entries to push the fixture past the Bodhi limit.
@@ -66,11 +62,6 @@ def test_oversized_single_entry_is_hard_truncated(tmp_path):
     result = p.read_text(encoding="utf-8")
     assert result.startswith(header)
     assert len(result) == _BODHI_NOTES_MAX
-
-
-# ---------------------------------------------------------------------------
-# resolve_branches
-# ---------------------------------------------------------------------------
 
 
 def _project(name: str, branches: list[str], forge: str = "pagure") -> MagicMock:

@@ -17,6 +17,7 @@ roz propose --project <project> --forge <forge> --version <version> [options]
 | `--branch BRANCH` | No | Limit to specific branch(es). Repeatable. Defaults to all forge branches. |
 | `--offline` | No | Skip tarball upload to lookaside cache. |
 | `--resolve TICKET` | No | Bug/ticket to close (e.g. `rhbz#12345`, `RSPEED-678`). Repeatable. Added as `Resolve:` commit trailers. |
+| `--title TITLE` | No | Commit message title. Supports the `{version}` placeholder. The PR title is derived automatically as `<title> for <branch>`. Defaults to the package-defined commit message. |
 
 ## What it does
 
@@ -33,6 +34,10 @@ roz propose --project <project> --forge <forge> --version <version> [options]
 
 ```
 roz propose --project goose --forge pagure --branch f44 --branch epel10 --resolve rhbz#2300001
+```
+
+```
+roz propose --project goose --forge pagure --branch f44 --title "Rebase goose {version}"
 ```
 
 ## Caveats

@@ -48,6 +48,17 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
             "May be repeated. Appended as 'Resolves: TICKET' trailers in the commit message."
         ),
     )
+    parser.add_argument(
+        "--title",
+        default=None,
+        metavar="TITLE",
+        help=(
+            "Commit message title. Supports the {version} placeholder "
+            "(e.g. 'Rebase goose {version}'). "
+            "The PR title is derived automatically as '<title> for <branch>'. "
+            "Defaults to the package-defined COMMIT_MESSAGE."
+        ),
+    )
     parser.set_defaults(handler=run)
 
 
@@ -62,4 +73,5 @@ def run(args: argparse.Namespace) -> None:
         yes=args.yes,
         keep=args.keep,
         resolves=args.resolves,
+        title=args.title,
     )

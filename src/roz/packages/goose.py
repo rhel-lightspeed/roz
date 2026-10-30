@@ -240,7 +240,7 @@ class GoosePackage(PackageProtocol):
             stable_days: Days in testing before auto-promotion.
         """
         for branch in branches:
-            koji_build = koji.latest_build(self.NAME, f"{branch}-build")
+            koji_build = koji.latest_build(self.NAME, f"{branch}-testing")
             update_notes = notes or f"Update to {koji_build}."
             bodhi.update(
                 Path.cwd(),
